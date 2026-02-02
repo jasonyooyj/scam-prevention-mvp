@@ -39,7 +39,7 @@ ${scamPoints.map((p, i) => `${i + 1}. ${p}`).join('\n')}
 이 메시지가 안전한 이유를 친근하고 이해하기 쉬운 말투로 설명해주세요. 이모지는 사용하지 마세요.`;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4.1-nano',
+    model: 'gpt-5.2',
     messages: [
       {
         role: 'system',
