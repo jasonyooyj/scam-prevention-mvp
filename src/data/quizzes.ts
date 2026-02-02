@@ -1,0 +1,322 @@
+// 실제 사기 사례 기반 퀴즈 데이터
+// 출처: 금융감독원, KISA, KB금융, 뉴스 보도
+
+export interface QuizItem {
+  id: string;
+  category: 'alba' | 'secondhand' | 'smishing' | 'sns';
+  content: string;
+  isScam: boolean;
+  explanation: string;
+  scamPoints?: string[];
+  source?: string;
+}
+
+export const quizzes: QuizItem[] = [
+  // ==================== 스미싱 (smishing) ====================
+  // 실제 사례 - 택배 사칭
+  {
+    id: 'smishing-1',
+    category: 'smishing',
+    content: '[CJ대한통운] 배송실패. 주소를 정확히 입력하세요. http://bit.ly/3xK2mN',
+    isScam: true,
+    explanation: '택배사는 절대 문자에 URL 링크를 포함하지 않습니다. 실제 배송 문제가 있으면 기사님이 직접 전화하거나 앱으로 알림이 옵니다.',
+    scamPoints: ['택배사 사칭', '수상한 단축 URL', '개인정보 입력 유도'],
+    source: 'KISA 118상담센터',
+  },
+  {
+    id: 'smishing-2',
+    category: 'smishing',
+    content: '주문하신 물품 1/24일 배송 예정. 주소입력: http://delivery-check.xyz',
+    isScam: true,
+    explanation: '정상적인 택배 알림은 배송 앱이나 쇼핑몰 앱을 통해 옵니다. 외부 링크로 주소 입력을 유도하는 것은 피싱입니다.',
+    scamPoints: ['정체불명 URL', '주소 재입력 요구', '발신번호 불명확'],
+    source: 'KB금융 2025',
+  },
+  {
+    id: 'smishing-3',
+    category: 'smishing',
+    content: '[로젠택배] 고객님 택배가 도착했습니다. 배송조회: 1588-9988',
+    isScam: false,
+    explanation: '정상적인 택배 알림입니다. URL 링크가 없고 공식 고객센터 번호만 안내하고 있습니다. 필요시 공식 앱에서 조회하세요.',
+  },
+  // 실제 사례 - 카드/금융 사칭
+  {
+    id: 'smishing-4',
+    category: 'smishing',
+    content: '[KB국민카드] (5499) 카드 신청접수 고객님 신청이 아니시면 사고예방접수: 1551-2234',
+    isScam: true,
+    explanation: '카드사 사칭 스미싱입니다. 실제 카드 발급 시 이런 문자가 오지 않으며, 전화를 걸면 개인정보를 요구합니다. 카드사 공식 앱에서 직접 확인하세요.',
+    scamPoints: ['카드사 사칭', '불안감 조성', '전화 유도'],
+    source: 'KB금융 2025',
+  },
+  {
+    id: 'smishing-5',
+    category: 'smishing',
+    content: '해외직구 결제 639,900원 완료. 본인 아닐 시 고객센터 신고 1566-0000',
+    isScam: true,
+    explanation: '기관사칭형 스미싱입니다. 놀라서 전화하면 "명의도용 피해 방지"를 빙자해 개인정보나 금융정보를 요구합니다.',
+    scamPoints: ['허위 결제 알림', '불안감 조성', '전화 유도 후 정보 탈취'],
+    source: '금융감독원',
+  },
+  {
+    id: 'smishing-6',
+    category: 'smishing',
+    content: '[신한카드] 1월 결제금액 523,400원 결제예정일 01/15 결제계좌 잔액확인 바랍니다.',
+    isScam: false,
+    explanation: '정상적인 카드 결제 예정 알림입니다. 링크가 없고 단순 안내만 하고 있습니다. 의심되면 카드사 앱에서 직접 확인하세요.',
+  },
+  // 실제 사례 - 기관 사칭
+  {
+    id: 'smishing-7',
+    category: 'smishing',
+    content: '[건강보험공단] 건강검진 통보내역 정상발송. 내용보기 http://nhis-check.com',
+    isScam: true,
+    explanation: '건강보험공단은 검진 결과를 문자로 보내지 않으며, 문자에 URL을 절대 포함하지 않습니다. 공단 대표번호(1577-1000)만 안내합니다.',
+    scamPoints: ['공단 사칭', '가짜 URL', '개인정보 탈취 목적'],
+    source: 'KISA 2024',
+  },
+  {
+    id: 'smishing-8',
+    category: 'smishing',
+    content: '[국민건강보험] 2025년 건강검진 대상자입니다. 검진기관 조회는 공단 앱 또는 1577-1000에서 확인하세요.',
+    isScam: false,
+    explanation: '정상적인 건강검진 안내입니다. URL이 없고 공식 채널만 안내하고 있습니다.',
+  },
+  {
+    id: 'smishing-9',
+    category: 'smishing',
+    content: '[1533-4015] 귀하의 교통위반 과태료 미납내역 안내 http://gov-fine.xyz/check',
+    isScam: true,
+    explanation: '정부기관은 과태료 안내에 외부 링크를 사용하지 않습니다. 실제 과태료는 우편이나 정부24 앱으로 확인하세요.',
+    scamPoints: ['정부기관 사칭', '피싱 URL', '공포심 유발'],
+    source: 'KB금융 2025',
+  },
+  {
+    id: 'smishing-10',
+    category: 'smishing',
+    content: '아버지께서 오늘 별세하셨기에 삼가 알려드립니다. 장례식장 http://funeral-info.com',
+    isScam: true,
+    explanation: '부고 사칭 스미싱입니다. 링크를 클릭하면 악성앱이 설치됩니다. 모르는 번호의 부고 문자는 반드시 전화로 확인하세요.',
+    scamPoints: ['부고 사칭', '감정적 판단 유도', '악성앱 설치'],
+    source: 'KISA 118상담센터',
+  },
+
+  // ==================== 중고거래 사기 (secondhand) ====================
+  {
+    id: 'secondhand-1',
+    category: 'secondhand',
+    content: '안녕하세요! 상품 구매 원합니다. 안전결제로 진행하고 싶은데 이 링크로 결제해주세요 http://naverpay-safe.com/order',
+    isScam: true,
+    explanation: '네이버페이 안전결제 피싱입니다. 정상적인 안전결제는 해당 플랫폼 내에서 진행되며, 별도 링크를 보내지 않습니다. 2024년 이 수법으로 230명 이상이 피해를 봤습니다.',
+    scamPoints: ['가짜 안전결제 링크', '외부 URL 유도', '플랫폼 이탈 유도'],
+    source: 'YTN 2024.10',
+  },
+  {
+    id: 'secondhand-2',
+    category: 'secondhand',
+    content: '결제 오류가 났어요. 수수료 3,000원을 추가로 보내주시면 바로 처리됩니다. 앞서 보낸 돈은 자동 환불돼요.',
+    isScam: true,
+    explanation: '이중결제 유도 사기입니다. 정상적인 안전결제에서는 절대 추가 수수료를 요구하지 않습니다. "자동 환불"은 거짓말입니다.',
+    scamPoints: ['추가 입금 요구', '수수료 명목 사기', '자동환불 거짓말'],
+    source: 'SBS 뉴스 2024',
+  },
+  {
+    id: 'secondhand-3',
+    category: 'secondhand',
+    content: '물건 상태 좋아요! 직거래 가능하시면 강남역 근처에서 만나요. 시간 언제가 좋으세요?',
+    isScam: false,
+    explanation: '정상적인 직거래 제안입니다. 직접 만나서 물건을 확인하고 거래하는 것이 가장 안전합니다.',
+  },
+  {
+    id: 'secondhand-4',
+    category: 'secondhand',
+    content: '지금 지방에 있어서 직거래가 어려워요. 택배로 보내드릴게요. 먼저 입금해주시면 바로 발송합니다!',
+    isScam: true,
+    explanation: '선입금 후 잠수 사기의 전형적인 패턴입니다. "지방", "해외", "군대"를 핑계로 직거래를 피하고 선입금을 요구합니다.',
+    scamPoints: ['직거래 회피', '선입금 요구', '검증 불가능한 상황'],
+    source: '당근마켓 사기 사례',
+  },
+  {
+    id: 'secondhand-5',
+    category: 'secondhand',
+    content: '당근마켓 안전결제로 진행할게요. 앱 내에서 결제 버튼 눌러주세요.',
+    isScam: false,
+    explanation: '정상적인 안전결제 안내입니다. 앱 내 기능을 사용하고 외부 링크가 없어 안전합니다.',
+  },
+  {
+    id: 'secondhand-6',
+    category: 'secondhand',
+    content: '급처분이라 시세보다 30% 싸게 드립니다. 오늘 안에 결제해주시면 사은품도 드려요!',
+    isScam: true,
+    explanation: '시세보다 지나치게 저렴하거나 급하게 결제를 유도하면 사기를 의심하세요. 사진 도용 및 허위매물일 가능성이 높습니다.',
+    scamPoints: ['비정상적 저가', '결제 압박', '사은품 미끼'],
+    source: '중고나라 사기 예방',
+  },
+  {
+    id: 'secondhand-7',
+    category: 'secondhand',
+    content: '거래 전에 더치트에서 제 계좌번호 조회해보셔도 돼요. 깨끗합니다!',
+    isScam: false,
+    explanation: '사기 이력 조회를 먼저 권하는 것은 신뢰할 수 있는 판매자의 태도입니다. 더치트(thecheat.co.kr)에서 계좌/전화번호 조회가 가능합니다.',
+  },
+
+  // ==================== 알바 사기 (alba) ====================
+  {
+    id: 'alba-1',
+    category: 'alba',
+    content: '[급구] 재택알바 일 3~5만원 보장! 스마트폰만 있으면 OK. 카톡 문의: money_job2025',
+    isScam: true,
+    explanation: '고수익 재택알바 광고의 99%는 사기입니다. 카톡으로만 연락받는 것은 추적을 피하기 위함입니다. 보이스피싱 조직의 대포통장 모집일 수 있습니다.',
+    scamPoints: ['비현실적 고수익', '카톡만 연락', '업무 내용 불명확'],
+    source: '알바몬 취업사기 사례',
+  },
+  {
+    id: 'alba-2',
+    category: 'alba',
+    content: '축하드립니다! 서류 합격하셨습니다. 근무 시작 전 교육비 5만원을 아래 계좌로 입금해주세요.',
+    isScam: true,
+    explanation: '정상적인 회사는 절대 교육비, 등록비, 보증금 등을 요구하지 않습니다. 입사 전 돈을 요구하면 100% 사기입니다.',
+    scamPoints: ['선입금 요구', '교육비/등록비 명목', '합격 미끼'],
+    source: '금융감독원',
+  },
+  {
+    id: 'alba-3',
+    category: 'alba',
+    content: '[GS25 강남점] 주말 파트타임 모집. 시급 10,500원. 지원: 02-1234-5678',
+    isScam: false,
+    explanation: '정상적인 알바 공고입니다. 구체적인 업체명, 위치, 시급, 연락처가 명시되어 있습니다. 지원 전 해당 매장에 직접 확인해보세요.',
+  },
+  {
+    id: 'alba-4',
+    category: 'alba',
+    content: '리뷰 작성 알바 하실 분! 건당 5천원. 하루 10건만 쓰면 5만원! 선불로 포인트 2만원 충전 필요.',
+    isScam: true,
+    explanation: '리뷰 알바 자체도 불법이지만, 선불 포인트 충전을 요구하는 것은 명백한 사기입니다. 충전 후 연락이 끊깁니다.',
+    scamPoints: ['선불 충전 요구', '리뷰 조작 알바', '비현실적 수익'],
+    source: 'SNS 손부업 사기 사례',
+  },
+  {
+    id: 'alba-5',
+    category: 'alba',
+    content: '급여 정산을 위해 체크카드와 비밀번호를 보내주세요. 회계처리용입니다.',
+    isScam: true,
+    explanation: '체크카드와 비밀번호를 요구하는 것은 대포통장 범죄에 사용하려는 것입니다. 이에 응하면 본인도 범죄에 연루됩니다.',
+    scamPoints: ['카드+비밀번호 요구', '대포통장 범죄', '공범 연루 위험'],
+    source: '알바몬 취업사기',
+  },
+  {
+    id: 'alba-6',
+    category: 'alba',
+    content: '[쿠팡 물류센터] 새벽 배송 상하차 알바. 시급 12,000원+야간수당. 면접 후 당일근무 가능. 031-XXX-XXXX',
+    isScam: false,
+    explanation: '정상적인 물류센터 알바 공고입니다. 구체적인 업무, 시급, 연락처가 명시되어 있고 선입금 요구가 없습니다.',
+  },
+  {
+    id: 'alba-7',
+    category: 'alba',
+    content: '코인 투자 리딩방 운영 도와주실 분. 월 500만원 이상 가능. 경력 무관.',
+    isScam: true,
+    explanation: '코인 리딩방 운영 알바는 투자 사기 조직의 공범이 되는 것입니다. "경력 무관 고수익"은 사기의 대표적 특징입니다.',
+    scamPoints: ['비현실적 고수익', '투자 사기 연루', '경력 무관 강조'],
+    source: '사이버사기 현황 2024',
+  },
+
+  // ==================== SNS 사기 (sns) ====================
+  {
+    id: 'sns-1',
+    category: 'sns',
+    content: '저 주식으로 3개월 만에 5천만원 벌었어요. 저희 리딩방 들어오시면 수익 보장해드려요. 입장료 50만원.',
+    isScam: true,
+    explanation: '주식/코인 리딩방 사기입니다. 수익을 "보장"하는 투자는 존재하지 않으며, 고액의 입장료를 받고 손실이 나면 책임지지 않습니다.',
+    scamPoints: ['수익 보장 주장', '고액 입장료', '과장된 수익 자랑'],
+    source: '금융감독원',
+  },
+  {
+    id: 'sns-2',
+    category: 'sns',
+    content: '엄마 나 휴대폰 액정이 깨져서 임시번호로 연락했어. 급하게 50만원만 이 계좌로 보내줘.',
+    isScam: true,
+    explanation: '메신저 피싱(가족 사칭)입니다. 자녀를 사칭해 급하게 돈을 요구합니다. 반드시 기존 번호로 전화해서 확인하세요.',
+    scamPoints: ['가족 사칭', '임시번호 핑계', '급한 송금 요구'],
+    source: '금융감독원 2024',
+  },
+  {
+    id: 'sns-3',
+    category: 'sns',
+    content: '안녕하세요, 저는 미국에서 근무하는 군의관입니다. 당신과 대화하고 싶어요. 프로필 사진 보고 반했어요.',
+    isScam: true,
+    explanation: '로맨스 스캠입니다. 해외 군인/의사 등을 사칭하며 친밀감을 쌓은 후 각종 명목으로 돈을 요구합니다.',
+    scamPoints: ['해외 전문직 사칭', '일방적 호감 표현', '신분 검증 불가'],
+    source: '나무위키 로맨스 스캠',
+  },
+  {
+    id: 'sns-4',
+    category: 'sns',
+    content: '[친구 태그] 야 이거 너 아니야? ㅋㅋㅋ http://viral-video.xyz/watch?id=28371',
+    isScam: true,
+    explanation: 'SNS 계정 탈취 피싱입니다. 링크 클릭 시 로그인 페이지로 위장한 피싱 사이트로 연결됩니다. 계정 정보가 탈취됩니다.',
+    scamPoints: ['호기심 유발', '피싱 링크', '계정 탈취 목적'],
+    source: 'KISA',
+  },
+  {
+    id: 'sns-5',
+    category: 'sns',
+    content: '2억원어치 코인이 곧 소각됩니다. 찾으시려면 수수료 300만원을 먼저 입금해주세요.',
+    isScam: true,
+    explanation: '코인 회수 명목 선입금 사기입니다. 존재하지 않는 자산을 미끼로 수수료를 요구합니다.',
+    scamPoints: ['가짜 자산 주장', '선입금 요구', '긴급성 강조'],
+    source: '뉴스1 2024',
+  },
+  {
+    id: 'sns-6',
+    category: 'sns',
+    content: '오늘의 운세 확인하기! 생년월일 입력하고 무료로 확인하세요 ^^',
+    isScam: false,
+    explanation: '단순 운세 서비스는 사기가 아닐 수 있습니다. 다만 개인정보(주민번호 등)를 과도하게 요구하면 주의하세요.',
+  },
+  {
+    id: 'sns-7',
+    category: 'sns',
+    content: '축하드립니다! 이벤트 당첨되셨습니다. 경품 수령을 위해 배송비 5,000원을 입금해주세요.',
+    isScam: true,
+    explanation: '가짜 이벤트 당첨 사기입니다. 정상적인 이벤트는 당첨자에게 배송비를 요구하지 않습니다.',
+    scamPoints: ['가짜 당첨', '배송비 명목', '개인정보 수집'],
+    source: '소비자원',
+  },
+  {
+    id: 'sns-8',
+    category: 'sns',
+    content: '아빠 나야. 폰이 고장나서 친구폰으로 연락해. 급하게 100만원만 보내줘. 나중에 갚을게.',
+    isScam: true,
+    explanation: '메신저 피싱입니다. 가족을 사칭해 급하게 송금을 요구합니다. 항상 기존에 저장된 번호로 직접 전화해서 확인하세요.',
+    scamPoints: ['가족 사칭', '폰 고장 핑계', '급한 송금 요청'],
+    source: '금융감독원',
+  },
+];
+
+// 카테고리별 퀴즈 필터링
+export function getQuizzesByCategory(category: string): QuizItem[] {
+  if (category === 'random') {
+    return [...quizzes].sort(() => Math.random() - 0.5);
+  }
+  return quizzes.filter((q) => q.category === category);
+}
+
+// 랜덤 퀴즈 선택
+export function getRandomQuizzes(count: number, category?: string): QuizItem[] {
+  const filtered = category && category !== 'random'
+    ? quizzes.filter((q) => q.category === category)
+    : quizzes;
+
+  return [...filtered]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, count);
+}
+
+export const categoryLabels: Record<string, string> = {
+  alba: '알바 사기',
+  secondhand: '중고거래 사기',
+  smishing: '스미싱',
+  sns: 'SNS 사기',
+  random: '전체',
+};
