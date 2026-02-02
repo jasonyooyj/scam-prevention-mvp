@@ -20,8 +20,11 @@
 | Frontend | Next.js 16 + TailwindCSS + shadcn/ui |
 | Backend | Next.js API Routes |
 | Database | Neon (PostgreSQL) + Drizzle ORM |
-| AI | OpenAI GPT-4o-mini |
+| AI | OpenAI GPT-4.1-nano (고정) |
 | Deploy | Vercel |
+
+## 중요 규칙
+- **AI 모델 변경 금지**: `src/lib/openai.ts`의 모델은 반드시 `gpt-4.1-nano`로 유지. 다른 모델로 변경하지 말 것.
 
 ## 프로젝트 구조
 ```
