@@ -4,6 +4,7 @@
  */
 
 const SESSION_KEY = 'scam_prevention_session_id';
+const QUIZ_PROGRESS_KEY = 'scam_prevention_quiz_progress';
 
 /**
  * UUID v4 형식의 세션 ID 생성
@@ -85,5 +86,72 @@ export function hasSession(): boolean {
     return localStorage.getItem(SESSION_KEY) !== null;
   } catch {
     return false;
+  }
+}
+
+/**
+ * 퀴즈 진행 상태 타입
+ */
+export interface QuizProgress {
+  category: string;
+  currentIndex: number;
+  score: number;
+  quizIds: number[];
+  timestamp: number;
+}
+
+/**
+ * 퀴즈 진행 상태 저장
+ */
+export function saveQuizProgress(progress: QuizProgress): void {
+  if (!isClient()) return;
+
+  try {
+    localStorage.setItem(QUIZ_PROGRESS_KEY, JSON.stringify(progress));
+  } catch (error) {
+    console.warn('Failed to save quiz progress:', error);
+  }
+}
+
+/**
+ * 퀴즈 진행 상태 불러오기
+ * 24시간이 지난 진행 상태는 무효화
+ */
+export function loadQuizProgress(category: string): QuizProgress | null {
+  if (!isClient()) return null;
+
+  try {
+    const data = localStorage.getItem(QUIZ_PROGRESS_KEY);
+    if (!data) return null;
+
+    const progress: QuizProgress = JSON.parse(data);
+
+    // 카테고리가 다르면 무시
+    if (progress.category !== category) return null;
+
+    // 24시간이 지난 진행 상태는 무효화
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    if (Date.now() - progress.timestamp > ONE_DAY) {
+      clearQuizProgress();
+      return null;
+    }
+
+    return progress;
+  } catch (error) {
+    console.warn('Failed to load quiz progress:', error);
+    return null;
+  }
+}
+
+/**
+ * 퀴즈 진행 상태 삭제
+ */
+export function clearQuizProgress(): void {
+  if (!isClient()) return;
+
+  try {
+    localStorage.removeItem(QUIZ_PROGRESS_KEY);
+  } catch (error) {
+    console.warn('Failed to clear quiz progress:', error);
   }
 }

@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Trophy, Medal, Award, User, Loader2, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Trophy, Medal, Award, User, BarChart3 } from 'lucide-react';
 import { getSessionId } from '@/lib/session';
+import RankingSkeleton from '@/components/RankingSkeleton';
 
 // 카테고리 정보
 const categoryNames: Record<string, string> = {
@@ -145,13 +146,8 @@ export default function RankingPage() {
           ))}
         </div>
 
-        {/* 로딩 상태 */}
-        {loading && (
-          <div className="text-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-slate-600 dark:text-slate-400" />
-            <p className="text-slate-600 dark:text-slate-400">랭킹을 불러오는 중...</p>
-          </div>
-        )}
+        {/* 로딩 상태 - 스켈레톤 UI */}
+        {loading && <RankingSkeleton />}
 
         {/* 에러 상태 */}
         {error && (

@@ -8,6 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, CheckCircle, XCircle, ArrowRight, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
 import { categoryLabels } from '@/data/quizzes';
 import { useSound, useVibration } from '@/hooks/useSound';
+import QuizSkeleton from '@/components/QuizSkeleton';
+import ExitConfirmDialog from '@/components/ExitConfirmDialog';
+import { saveQuizProgress, loadQuizProgress, clearQuizProgress, QuizProgress } from '@/lib/session';
+import ResumeQuizDialog from '@/components/ResumeQuizDialog';
 
 // DB에서 가져오는 퀴즈 타입
 interface QuizFromDB {
@@ -56,6 +60,14 @@ export default function QuizPage({ params }: PageProps) {
   // Animation state
   const [answerAnimation, setAnswerAnimation] = useState<'correct' | 'incorrect' | null>(null);
 
+  // Exit confirmation state
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+
+  // Resume quiz state
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [savedProgress, setSavedProgress] = useState<QuizProgress | null>(null);
+
   // Sound and haptic hooks
   const { play: playCorrect } = useSound('/sounds/correct.mp3', { volume: 0.5 });
   const { play: playIncorrect } = useSound('/sounds/incorrect.mp3', { volume: 0.5 });
@@ -80,6 +92,19 @@ export default function QuizPage({ params }: PageProps) {
         }
 
         setQuizzes(data.data);
+
+        // Check for saved progress after quizzes are loaded
+        const progress = loadQuizProgress(category);
+        if (progress && progress.quizIds.length > 0) {
+          // Verify the quiz IDs match
+          const quizIds = data.data.map((q: QuizFromDB) => q.id);
+          const idsMatch = progress.quizIds.every((id: number, idx: number) => quizIds[idx] === id);
+
+          if (idsMatch && progress.currentIndex > 0) {
+            setSavedProgress(progress);
+            setShowResumeDialog(true);
+          }
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
@@ -89,6 +114,70 @@ export default function QuizPage({ params }: PageProps) {
 
     fetchQuizzes();
   }, [category]);
+
+  // Save progress when quiz state changes
+  useEffect(() => {
+    if (quizzes.length > 0 && currentIndex > 0) {
+      saveQuizProgress({
+        category,
+        currentIndex,
+        score,
+        quizIds: quizzes.map((q) => q.id),
+        timestamp: Date.now(),
+      });
+    }
+  }, [category, currentIndex, score, quizzes]);
+
+  // beforeunload 이벤트로 실수 방지 (퀴즈 진행 중일 때만)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (currentIndex > 0 || showResult) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [currentIndex, showResult]);
+
+  // 홈으로 돌아가기 핸들러 (확인 다이얼로그 표시)
+  const handleBackToHome = () => {
+    if (currentIndex > 0 || showResult) {
+      setPendingNavigation('/');
+      setShowExitDialog(true);
+    } else {
+      router.push('/');
+    }
+  };
+
+  const handleExitConfirm = () => {
+    setShowExitDialog(false);
+    if (pendingNavigation) {
+      router.push(pendingNavigation);
+    }
+  };
+
+  const handleExitCancel = () => {
+    setShowExitDialog(false);
+    setPendingNavigation(null);
+  };
+
+  // Resume quiz handlers
+  const handleResumeQuiz = () => {
+    if (savedProgress) {
+      setCurrentIndex(savedProgress.currentIndex);
+      setScore(savedProgress.score);
+    }
+    setShowResumeDialog(false);
+    setSavedProgress(null);
+  };
+
+  const handleRestartQuiz = () => {
+    clearQuizProgress();
+    setShowResumeDialog(false);
+    setSavedProgress(null);
+  };
 
   const currentQuiz = quizzes[currentIndex];
   const totalQuestions = quizzes.length;
@@ -160,7 +249,8 @@ export default function QuizPage({ params }: PageProps) {
   // 다음 문제로 이동
   const handleNext = () => {
     if (currentIndex + 1 >= totalQuestions) {
-      // 퀴즈 완료 - 결과 페이지로 이동
+      // 퀴즈 완료 - 진행 상태 삭제 후 결과 페이지로 이동
+      clearQuizProgress();
       router.push(`/result?score=${score}&total=${totalQuestions}&category=${category}`);
     } else {
       setCurrentIndex((prev) => prev + 1);
@@ -171,16 +261,9 @@ export default function QuizPage({ params }: PageProps) {
     }
   };
 
-  // 로딩 상태
+  // 로딩 상태 - 스켈레톤 UI 사용
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-slate-600 dark:text-slate-400" />
-          <p className="text-slate-600 dark:text-slate-400">퀴즈를 불러오는 중...</p>
-        </div>
-      </div>
-    );
+    return <QuizSkeleton />;
   }
 
   // 에러 상태
@@ -216,6 +299,23 @@ export default function QuizPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+      {/* Exit confirmation dialog */}
+      <ExitConfirmDialog
+        isOpen={showExitDialog}
+        onConfirm={handleExitConfirm}
+        onCancel={handleExitCancel}
+      />
+
+      {/* Resume quiz dialog */}
+      <ResumeQuizDialog
+        isOpen={showResumeDialog}
+        currentIndex={savedProgress?.currentIndex || 0}
+        totalQuestions={totalQuestions}
+        score={savedProgress?.score || 0}
+        onResume={handleResumeQuiz}
+        onRestart={handleRestartQuiz}
+      />
+
       {/* Skip to quiz content */}
       <a
         href="#quiz-content"
@@ -227,10 +327,13 @@ export default function QuizPage({ params }: PageProps) {
       <main className="container mx-auto px-4 py-8 max-w-2xl" role="main">
         {/* 헤더 */}
         <header className="mb-8">
-          <Link href="/" className="inline-flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="inline-flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 mb-4"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             홈으로 돌아가기
-          </Link>
+          </button>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`px-3 py-1 rounded-full text-white text-sm font-medium ${categoryColors[category] || categoryColors.random}`}>

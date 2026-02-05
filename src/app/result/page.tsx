@@ -10,6 +10,7 @@ import { getSessionId } from '@/lib/session';
 import NicknameDialog from '@/components/NicknameDialog';
 import Confetti from '@/components/Confetti';
 import { useSound } from '@/hooks/useSound';
+import { toast } from 'sonner';
 
 // 카테고리 정보
 const categoryNames: Record<string, string> = {
@@ -99,7 +100,7 @@ function ResultContent() {
   const GradeIcon = grade.icon;
   const categoryName = categoryNames[category] || category;
 
-  // Save score function
+  // Save score function with toast feedback
   const saveScore = useCallback(async (nickname: string | null) => {
     if (scoreSaved) return;
     setScoreSaved(true);
@@ -108,7 +109,7 @@ function ResultContent() {
     if (!sessionId) return;
 
     try {
-      await fetch('/api/score', {
+      const response = await fetch('/api/score', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,8 +123,19 @@ function ResultContent() {
           totalCount: total,
         }),
       });
+
+      if (response.ok) {
+        toast.success('점수가 저장되었습니다!', {
+          description: '랭킹에서 순위를 확인해보세요.',
+        });
+      } else {
+        throw new Error('점수 저장 실패');
+      }
     } catch (error) {
       console.error('점수 저장 실패:', error);
+      toast.error('점수 저장에 실패했습니다', {
+        description: '잠시 후 다시 시도해주세요.',
+      });
     }
   }, [category, percentage, score, total, scoreSaved]);
 
@@ -134,7 +146,7 @@ function ResultContent() {
     saveScore(nickname);
   }, [saveScore]);
 
-  // Show nickname dialog and confetti after 1 second
+  // Show nickname dialog and confetti immediately (no delay)
   useEffect(() => {
     if (dialogShownRef.current) return;
     dialogShownRef.current = true;
@@ -145,11 +157,8 @@ function ResultContent() {
       playCelebration();
     }
 
-    const timer = setTimeout(() => {
-      setShowNicknameDialog(true);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    // Show nickname dialog immediately
+    setShowNicknameDialog(true);
   }, [percentage, playCelebration]);
 
   // 공유하기 기능
@@ -178,9 +187,11 @@ function ResultContent() {
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
+      toast.success('클립보드에 복사되었습니다!');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('클립보드 복사 실패:', err);
+      toast.error('복사에 실패했습니다');
     }
   };
 

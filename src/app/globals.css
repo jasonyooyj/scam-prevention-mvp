@@ -170,3 +170,23 @@
 .animate-confetti-fall {
   animation: confetti-fall 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-correct,
+  .animate-incorrect,
+  .animate-confetti-fall,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+}

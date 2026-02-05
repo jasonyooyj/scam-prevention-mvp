@@ -1,9 +1,17 @@
 'use client';
 
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 
 interface SoundOptions {
   volume?: number;
+}
+
+/**
+ * Check if user prefers reduced motion
+ */
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 /**
@@ -26,8 +34,11 @@ export function useSound(soundPath: string, options: SoundOptions = {}) {
     return audioRef.current;
   }, [soundPath, volume]);
 
-  // Play sound
+  // Play sound (respects reduced motion preference)
   const play = useCallback(() => {
+    // Skip sound if user prefers reduced motion
+    if (prefersReducedMotion()) return;
+
     const audio = getAudio();
     if (!audio) return;
 
@@ -57,10 +68,13 @@ export function useSound(soundPath: string, options: SoundOptions = {}) {
 }
 
 /**
- * Hook for vibration feedback
+ * Hook for vibration feedback (respects reduced motion preference)
  */
 export function useVibration() {
   const vibrate = useCallback((pattern: number | number[] = 50) => {
+    // Skip vibration if user prefers reduced motion
+    if (prefersReducedMotion()) return;
+
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate(pattern);

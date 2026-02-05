@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, ShoppingBag, MessageSquare, Users, BarChart3 } from 'lucide-react';
+import OnboardingModal from '@/components/OnboardingModal';
 
 const categories = [
   {
@@ -39,6 +40,9 @@ const categories = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+      {/* Onboarding modal for first-time visitors */}
+      <OnboardingModal />
+
       {/* Skip to main content */}
       <a
         href="#main-content"
