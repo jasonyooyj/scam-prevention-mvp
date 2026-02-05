@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>탐정 안속아 - MVP 제안서</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #DC2626;
+      --primary-dark: #991B1B;
+      --accent: #2563EB;
+      --accent-light: #3B82F6;
+      --bg: #ffffff;
+      --text: #111827;
+      --text-secondary: #6B7280;
+      --text-muted: #9CA3AF;
+      --surface: #F9FAFB;
+      --border: #E5E7EB;
+      --success: #059669;
+      --success-bg: #ECFDF5;
+      --warning: #D97706;
+      --warning-bg: #FFFBEB;
+      --danger: #DC2626;
+      --danger-bg: #FEF2F2;
+      --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --gradient-hero: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #581c87 100%);
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f1f5f9;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .slide {
+      width: 1280px;
+      height: 720px;
+      background: var(--bg);
+      margin: 0 auto 40px;
+      position: relative;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      page-break-after: always;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .slide {
+        margin: 0;
+        box-shadow: none;
+        border-radius: 0;
+        page-break-after: always;
+      }
+    }
+
+    @page {
+      size: 1280px 720px;
+      margin: 0;
+    }
+
+    /* 공통 헤더 */
+    .slide-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: white;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-number {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: white;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .header-right {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* 콘텐츠 영역 */
+    .slide-content {
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 44px;
+      padding: 20px 40px;
+      overflow: hidden;
+    }
+
+    /* 푸터 */
+    .slide-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .footer-logos {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      height: 22px;
+      opacity: 0.7;
+    }
+
+    .footer-page {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       표지 슬라이드
+    ============================================ */
+    .slide.cover {
+      background: #f8fafc;
+    }
+
+    .slide.cover .slide-content {
+      top: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .cover-badge {
+      background: var(--accent);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .cover-icon {
+      width: 100px;
+      height: 100px;
+      background: white;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      border: 2px solid var(--border);
+    }
+
+    .cover-title {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+
+    .cover-subtitle {
+      font-size: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+      font-weight: 400;
+    }
+
+    .cover-table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
+    }
+
+    .cover-table td {
+      padding: 14px 32px;
+      font-size: 16px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cover-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .cover-table td:first-child {
+      background: var(--surface);
+      font-weight: 600;
+      width: 120px;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .cover-table td:last-child {
+      text-align: left;
+      min-width: 240px;
+    }
+
+    .slide.cover .slide-footer {
+      background: white;
+      border-top: 1px solid var(--border);
+    }
+
+    .slide.cover .footer-page {
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       섹션 타이틀
+    ============================================ */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .section-title-group h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .section-title-group p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* ============================================
+       그리드 시스템
+    ============================================ */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+    .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; }
+
+    /* ============================================
+       카드 컴포넌트
+    ============================================ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.2s;
+    }
+
+    .card.gradient-1 {
+      background: #EEF2FF;
+      border-color: #C7D2FE;
+    }
+
+    .card.gradient-2 {
+      background: #FDF2F8;
+      border-color: #FBCFE8;
+    }
+
+    .card.gradient-3 {
+      background: #ECFDF5;
+      border-color: #A7F3D0;
+    }
+
+    .card.gradient-4 {
+      background: #FEF3C7;
+      border-color: #FCD34D;
+    }
+
+    .card.dark {
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      border: 1px solid #93C5FD;
+      color: var(--text);
+    }
+
+    .card.dark h3, .card.dark h4, .card.dark p {
+      color: var(--text);
+    }
+
+    .card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .card ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card ul li {
+      font-size: 14px;
+      padding: 5px 0;
+      padding-left: 20px;
+      position: relative;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .card ul li:last-child {
+      border-bottom: none;
+    }
+
+    .card ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    /* ============================================
+       통계 카드
+    ============================================ */
+    .stat-card {
+      text-align: center;
+      padding: 16px 12px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    .stat-card .icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 10px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .stat-card .icon.red { background: #FEE2E2; }
+    .stat-card .icon.blue { background: #DBEAFE; }
+    .stat-card .icon.green { background: #D1FAE5; }
+    .stat-card .icon.purple { background: #EDE9FE; }
+
+    .stat-card .number {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .number span {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .stat-card .label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ============================================
+       테이블
+    ============================================ */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: var(--surface);
+    }
+
+    .data-table td:first-child {
+      font-weight: 600;
+    }
+
+    /* 비교 테이블 */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 12px 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .compare-table thead th {
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .compare-table thead th.old-header {
+      background: #FEF2F2;
+      color: #991B1B;
+      border-bottom: 2px solid #DC2626;
+    }
+
+    .compare-table thead th.new-header {
+      background: #ECFDF5;
+      color: #065F46;
+      border-bottom: 2px solid #059669;
+    }
+
+    .compare-table tbody td:first-child {
+      background: var(--surface);
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .compare-table .old-cell {
+      background: #FEF2F2;
+      color: #991B1B;
+    }
+
+    .compare-table .new-cell {
+      background: #ECFDF5;
+      color: #065F46;
+      font-weight: 600;
+    }
+
+    /* ============================================
+       Summary 테이블
+    ============================================ */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    .summary-table td {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 16px;
+      vertical-align: middle;
+    }
+
+    .summary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .summary-table td:first-child {
+      width: 160px;
+      background: #EEF2FF;
+      font-weight: 700;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .summary-table td:last-child {
+      background: white;
+    }
+
+    /* ============================================
+       플로우 다이어그램
+    ============================================ */
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 14px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px 8px;
+      min-width: 110px;
+    }
+
+    .flow-step .icon {
+      width: 44px;
+      height: 44px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      border: 2px solid var(--border);
+    }
+
+    .flow-step.active .icon {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .flow-step .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .flow-step .sublabel {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .flow-arrow {
+      font-size: 20px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ============================================
+       하이라이트 박스
+    ============================================ */
+    .highlight-box {
+      padding: 12px 18px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .highlight-box.blue {
+      background: #EFF6FF;
+      border: 1px solid #93C5FD;
+    }
+
+    .highlight-box.green {
+      background: #ECFDF5;
+      border: 1px solid #6EE7B7;
+    }
+
+    .highlight-box.yellow {
+      background: #FFFBEB;
+      border: 1px solid #FCD34D;
+    }
+
+    .highlight-box.purple {
+      background: #F5F3FF;
+      border: 1px solid #C4B5FD;
+    }
+
+    .highlight-box .icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .highlight-box p {
+      font-size: 15px;
+      margin: 0;
+      flex: 1;
+    }
+
+    .highlight-box strong {
+      color: var(--text);
+    }
+
+    /* ============================================
+       QR 코드 박스
+    ============================================ */
+    .qr-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      background: #EFF6FF;
+      border: 1px solid #93C5FD;
+      border-radius: 12px;
+      color: var(--text);
+    }
+
+    .qr-box .qr-code {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 10px;
+      padding: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .qr-box .qr-code img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .qr-box .qr-text h4 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--accent);
+    }
+
+    .qr-box .qr-text p {
+      font-size: 13px;
+      margin: 0;
+      color: var(--text-secondary);
+    }
+
+    .qr-box .qr-text .url {
+      font-family: 'SF Mono', monospace;
+      background: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      display: inline-block;
+      font-size: 12px;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    /* ============================================
+       예시 박스
+    ============================================ */
+    .example-box {
+      border-radius: 10px;
+      padding: 14px;
+      position: relative;
+    }
+
+    .example-box.scam {
+      background: #FEF2F2;
+      border: 2px solid #FECACA;
+    }
+
+    .example-box.safe {
+      background: #ECFDF5;
+      border: 2px solid #A7F3D0;
+    }
+
+    .example-label {
+      position: absolute;
+      top: -10px;
+      left: 14px;
+      padding: 3px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .example-box.scam .example-label {
+      background: #DC2626;
+      color: white;
+    }
+
+    .example-box.safe .example-label {
+      background: #059669;
+      color: white;
+    }
+
+    .example-content {
+      font-family: 'SF Mono', 'D2Coding', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
+    .scam-points {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .scam-point {
+      background: #DC2626;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* ============================================
+       로드맵
+    ============================================ */
+    .roadmap {
+      display: flex;
+      gap: 12px;
+    }
+
+    .roadmap-item {
+      flex: 1;
+      position: relative;
+    }
+
+    .roadmap-phase {
+      padding: 12px;
+      border-radius: 10px;
+      background: white;
+      border: 2px solid var(--border);
+      height: 100%;
+    }
+
+    .roadmap-phase.current {
+      border-color: var(--accent);
+      background: #EFF6FF;
+    }
+
+    .roadmap-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: var(--accent);
+      color: white;
+    }
+
+    .roadmap-badge.gray {
+      background: #6B7280;
+    }
+
+    .roadmap-phase h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .roadmap-phase ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .roadmap-phase ul li {
+      font-size: 12px;
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+      color: var(--text-secondary);
+    }
+
+    .roadmap-phase ul li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* ============================================
+       스크린샷 그리드
+    ============================================ */
+    .screenshot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .screenshot-item {
+      background: #F8FAFC;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+    }
+
+    .screenshot-item .mock-screen {
+      width: 120px;
+      height: 200px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      border: 3px solid #1F2937;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .screenshot-item .mock-screen::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 5px;
+      background: #1F2937;
+      border-radius: 8px;
+    }
+
+    .screenshot-item .mock-content {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .screenshot-item .mock-icon {
+      font-size: 40px;
+      margin-bottom: 6px;
+    }
+
+    .screenshot-item h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .screenshot-item p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       임팩트 통계
+    ============================================ */
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .impact-card {
+      background: white;
+      border: 2px solid var(--accent);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .impact-card::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 70%);
+    }
+
+    .impact-card .number {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+      color: var(--accent);
+    }
+
+    .impact-card .unit {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .impact-card .label {
+      font-size: 13px;
+      margin-top: 8px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       마지막 슬라이드
+    ============================================ */
+    .slide.final {
+      background: #f8fafc;
+    }
+
+    .slide.final .slide-content {
+      top: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .final-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .final-title {
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .final-subtitle {
+      font-size: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .final-stats {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .final-stat {
+      text-align: center;
+      padding: 18px 32px;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .final-stat .number {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .final-stat .label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .slide.final .slide-footer {
+      background: white;
+      border-top: 1px solid var(--border);
+    }
+
+    .slide.final .footer-page {
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       유틸리티
+    ============================================ */
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .mb-8 { margin-bottom: 6px; }
+    .mb-10 { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 10px; }
+    .mb-14 { margin-bottom: 12px; }
+    .mb-16 { margin-bottom: 12px; }
+    .mb-20 { margin-bottom: 14px; }
+    .mb-24 { margin-bottom: 16px; }
+    .mt-8 { margin-top: 6px; }
+    .mt-10 { margin-top: 8px; }
+    .mt-12 { margin-top: 10px; }
+    .mt-16 { margin-top: 12px; }
+    .mt-20 { margin-top: 14px; }
+    .gap-10 { gap: 8px; }
+    .gap-12 { gap: 10px; }
+    .gap-16 { gap: 12px; }
+    .gap-20 { gap: 14px; }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge.blue { background: #DBEAFE; color: #1E40AF; }
+    .badge.green { background: #D1FAE5; color: #065F46; }
+    .badge.red { background: #FEE2E2; color: #991B1B; }
+    .badge.purple { background: #EDE9FE; color: #5B21B6; }
+
+    .icon-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .icon-circle.red { background: #FEE2E2; }
+    .icon-circle.blue { background: #DBEAFE; }
+    .icon-circle.green { background: #D1FAE5; }
+    .icon-circle.purple { background: #EDE9FE; }
+    .icon-circle.yellow { background: #FEF3C7; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* 기능 리스트 */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .feature-item .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .feature-item h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .feature-item p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* 사용자 플로우 */
+    .user-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .user-flow-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .user-flow-item.highlight {
+      background: #EFF6FF;
+      border-color: var(--accent);
+    }
+
+    .user-flow-item .step-number {
+      width: 30px;
+      height: 30px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .user-flow-item .step-content {
+      flex: 1;
+    }
+
+    .user-flow-item h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .user-flow-item p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 2px 0 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 슬라이드 1: 표지 -->
+<div class="slide cover">
+  <div class="slide-content">
+    <div class="cover-badge">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+    <div class="cover-icon">🔍</div>
+    <h1 class="cover-title">탐정 안속아</h1>
+    <p class="cover-subtitle">"직접 경험해봐야 안 속는다" — AI 기반 게이미피케이션 예방 교육</p>
+
+    <table class="cover-table">
+      <tr>
+        <td>팀명</td>
+        <td>탐정 이름은 '안속아'입니다</td>
+      </tr>
+      <tr>
+        <td>서비스명</td>
+        <td>탐정 안속아</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">1 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 2: Summary -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">01</div>
+      <span class="header-title">Summary</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <table class="summary-table">
+      <tr>
+        <td>팀명</td>
+        <td>탐정 이름은 '안속아'입니다</td>
+      </tr>
+      <tr>
+        <td>팀원</td>
+        <td>유영준 (1명)</td>
+      </tr>
+      <tr>
+        <td>프로젝트명</td>
+        <td><strong style="font-size: 20px; color: #1e3a8a;">탐정 안속아</strong> <span class="badge blue">MVP 완성</span></td>
+      </tr>
+      <tr>
+        <td>세부 주제</td>
+        <td>퀴즈형 피싱·스캠 예방 교육 서비스</td>
+      </tr>
+      <tr>
+        <td>한줄소개</td>
+        <td>실제 사기 사례 기반 <strong>104개 퀴즈</strong>로 판별 능력을 키우고, <strong>GPT-5.2</strong>가 친근하게 해설해주는 게이미피케이션 예방 교육 플랫폼</td>
+      </tr>
+    </table>
+
+    <div class="qr-box mt-16">
+      <div class="qr-code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://scam-prevention-mvp.vercel.app" alt="QR Code">
+      </div>
+      <div class="qr-text">
+        <h4>🚀 지금 바로 체험해보세요!</h4>
+        <p>실제 동작하는 MVP를 직접 확인하실 수 있습니다</p>
+        <span class="url">https://scam-prevention-mvp.vercel.app</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">2 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 3: 문제 정의 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">02</div>
+      <span class="header-title">문제 정의 (Problem Definition)</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2">
+      <div>
+        <div class="section-header mb-14">
+          <div class="section-icon">📊</div>
+          <div class="section-title-group">
+            <h2>피해 현황</h2>
+            <p>2024년 기준 피싱·스캠 피해 통계</p>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-12">
+          <div class="stat-card">
+            <div class="icon red">💸</div>
+            <div class="number">7,744<span>억</span></div>
+            <div class="label">보이스피싱 피해액</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon blue">👥</div>
+            <div class="number">42<span>%</span></div>
+            <div class="label">MZ세대 피해 비율</div>
+          </div>
+        </div>
+
+        <div class="stat-card text-center">
+          <div class="icon green" style="margin: 0 auto 10px;">📱</div>
+          <div class="number">50만<span>+</span></div>
+          <div class="label">연간 스미싱 피해 건수</div>
+        </div>
+
+        <p style="font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center;">
+          출처: 금융감독원, 경찰청, KISA (2024)
+        </p>
+      </div>
+
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon" style="background: #DC2626;">⚠️</div>
+          <div class="section-title-group">
+            <h2>기존 교육의 한계</h2>
+            <p>왜 예방 교육이 효과가 없을까?</p>
+          </div>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="icon" style="background: #FEE2E2;">📺</div>
+            <div>
+              <h4>일방적 전달</h4>
+              <p>뉴스, 공익광고 → 수동적 시청, 낮은 기억 정착률</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="icon" style="background: #FEF3C7;">📝</div>
+            <div>
+              <h4>현실감 부족</h4>
+              <p>단순 예시 5~10개 → 실제 사기와 괴리</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="icon" style="background: #EDE9FE;">😴</div>
+            <div>
+              <h4>학습 동기 없음</h4>
+              <p>재미없음 → 자발적 학습 유도 실패</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="highlight-box yellow mt-12">
+          <div class="icon">💡</div>
+          <p><strong>핵심 질문:</strong> 어떻게 하면 자발적으로 학습하게 할 수 있을까?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">3 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 4: 제안 솔루션 개요 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">03</div>
+      <span class="header-title">제안 솔루션 개요 (Solution Overview)</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="highlight-box blue mb-16 text-center">
+      <div class="icon">🎯</div>
+      <p style="font-size: 18px;"><strong>"직접 경험해봐야 안 속는다"</strong> — 게이미피케이션 + AI 기반 예방 교육</p>
+    </div>
+
+    <div class="flow-diagram mb-16">
+      <div class="flow-step">
+        <div class="icon">📱</div>
+        <div class="label">사기 메시지</div>
+        <div class="sublabel">실제 사례 표시</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step active">
+        <div class="icon" style="color: white;">🤔</div>
+        <div class="label">"사기" / "정상"</div>
+        <div class="sublabel">직접 판별</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="icon">✅</div>
+        <div class="label">정답 확인</div>
+        <div class="sublabel">즉각 피드백</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step active">
+        <div class="icon" style="color: white;">🤖</div>
+        <div class="label">AI 해설</div>
+        <div class="sublabel">GPT-5.2</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="icon">🏆</div>
+        <div class="label">점수 & 랭킹</div>
+        <div class="sublabel">경쟁 유도</div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card gradient-1">
+        <h3><span class="icon-circle red">📝</span> 퀴즈 기반 체험 학습</h3>
+        <ul>
+          <li>104개 실제 사례 기반 문제</li>
+          <li>4개 카테고리 분류</li>
+          <li>난이도별 문제 구성</li>
+          <li>직접 판별 → 기억 정착률 ↑</li>
+        </ul>
+      </div>
+      <div class="card gradient-2">
+        <h3><span class="icon-circle blue">🤖</span> AI 개인화 해설</h3>
+        <ul>
+          <li>OpenAI GPT-5.2 기반</li>
+          <li>왜 사기인지/안전한지 설명</li>
+          <li>사기 수법 포인트 학습</li>
+          <li>친근한 대화형 피드백</li>
+        </ul>
+      </div>
+      <div class="card gradient-3">
+        <h3><span class="icon-circle purple">🏆</span> 게이미피케이션</h3>
+        <ul>
+          <li>전체/카테고리별 랭킹</li>
+          <li>점수 및 등급 시스템</li>
+          <li>결과 공유 기능</li>
+          <li>재방문 및 학습 동기 ↑</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">4 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 5: MVP 데모 스크린샷 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">04</div>
+      <span class="header-title">MVP 데모 화면</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="screenshot-grid mb-16">
+      <div class="screenshot-item">
+        <div class="mock-screen">
+          <div class="mock-content">
+            <div class="mock-icon">🏠</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">카테고리 선택</div>
+          </div>
+        </div>
+        <h4>메인 화면</h4>
+        <p>4개 카테고리 선택</p>
+      </div>
+      <div class="screenshot-item">
+        <div class="mock-screen">
+          <div class="mock-content">
+            <div class="mock-icon">❓</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">사기 vs 정상</div>
+          </div>
+        </div>
+        <h4>퀴즈 플레이</h4>
+        <p>실제 메시지 판별</p>
+      </div>
+      <div class="screenshot-item">
+        <div class="mock-screen">
+          <div class="mock-content">
+            <div class="mock-icon">🤖</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">GPT-5.2</div>
+          </div>
+        </div>
+        <h4>AI 해설</h4>
+        <p>맞춤형 설명 제공</p>
+      </div>
+      <div class="screenshot-item">
+        <div class="mock-screen">
+          <div class="mock-content">
+            <div class="mock-icon">🏆</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">순위 확인</div>
+          </div>
+        </div>
+        <h4>랭킹 & 결과</h4>
+        <p>점수 및 순위 공유</p>
+      </div>
+    </div>
+
+    <div class="qr-box">
+      <div class="qr-code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://scam-prevention-mvp.vercel.app" alt="QR Code">
+      </div>
+      <div class="qr-text">
+        <h4>🔗 실제 동작하는 MVP를 직접 체험해보세요!</h4>
+        <p>모바일/데스크톱 모두 지원 · 회원가입 없이 바로 시작</p>
+        <span class="url">https://scam-prevention-mvp.vercel.app</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">5 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 6: 비교표 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">05</div>
+      <span class="header-title">기존 예방 교육 vs 탐정 안속아</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <table class="compare-table mb-16">
+      <thead>
+        <tr>
+          <th style="width: 160px;">구분</th>
+          <th class="old-header" style="width: 340px;">❌ 기존 예방 교육</th>
+          <th class="new-header" style="width: 340px;">✅ 탐정 안속아</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>📚 학습 방식</td>
+          <td class="old-cell">일방적 시청 (영상, 포스터)</td>
+          <td class="new-cell">직접 판별 체험 (인터랙티브 퀴즈)</td>
+        </tr>
+        <tr>
+          <td>📝 콘텐츠 양</td>
+          <td class="old-cell">5~10개 단순 예시</td>
+          <td class="new-cell">104개 실제 사례 + 고급 모드 32문항</td>
+        </tr>
+        <tr>
+          <td>💬 피드백</td>
+          <td class="old-cell">없음 (일방통행)</td>
+          <td class="new-cell">GPT-5.2 실시간 개인화 해설</td>
+        </tr>
+        <tr>
+          <td>🎮 동기부여</td>
+          <td class="old-cell">없음 (지루함)</td>
+          <td class="new-cell">랭킹 / 점수 / 등급 / 공유</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="grid-2" style="gap: 16px;">
+      <div class="example-box scam">
+        <span class="example-label">🚨 실제 퀴즈 예시</span>
+        <div class="example-content">
+          [CJ대한통운] 배송실패. 주소확인 http://bit.ly/3xK2mN
+        </div>
+        <div class="scam-points">
+          <span class="scam-point">택배사 사칭</span>
+          <span class="scam-point">단축 URL</span>
+          <span class="scam-point">개인정보 유도</span>
+        </div>
+      </div>
+      <div class="example-box safe">
+        <span class="example-label">✅ AI 해설 예시</span>
+        <div class="example-content" style="font-family: inherit;">
+          "택배사는 공식 앱 알림을 사용하며, 문자에 URL을 포함하지 않습니다. 배송 문제 시 기사님이 직접 전화합니다. bit.ly 같은 단축 URL은 피싱의 대표적 수법입니다."
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">6 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 7: 주요 기능 정의 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">06</div>
+      <span class="header-title">주요 기능 정의 (Key Features)</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2">
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon">🎯</div>
+          <div class="section-title-group">
+            <h2>핵심 기능</h2>
+            <p>MVP 구현 완료</p>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>기능</th>
+              <th>상세 설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>🎮 퀴즈 플레이</td>
+              <td>실제 사기 vs 정상 메시지 판별<br>4개 카테고리, 총 104문항</td>
+            </tr>
+            <tr>
+              <td>🤖 AI 해설</td>
+              <td>GPT-5.2 기반 개인화 설명<br>사기 판별 포인트 학습</td>
+            </tr>
+            <tr>
+              <td>🏆 랭킹 시스템</td>
+              <td>전체/카테고리별 순위<br>개인 통계 (정답률, 연속 정답)</td>
+            </tr>
+            <tr>
+              <td>⚡ 고급 모드</td>
+              <td>정교하게 위장된 32문항<br>실제 피해자도 속은 수법</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon" style="background: #059669;">✅</div>
+          <div class="section-title-group">
+            <h2>구현 완료 기능</h2>
+            <p>Production Ready</p>
+          </div>
+        </div>
+
+        <div class="card gradient-3">
+          <ul style="margin: 0;">
+            <li>4개 카테고리 퀴즈 시스템</li>
+            <li>AI 해설 생성 (OpenAI GPT-5.2)</li>
+            <li>실시간 랭킹 및 점수 저장</li>
+            <li>온보딩 플로우 (첫 방문 가이드)</li>
+            <li>진행 상황 자동 저장 및 복원</li>
+            <li>접근성 지원 (ARIA, 키보드 내비게이션)</li>
+            <li>반응형 디자인 (모바일/데스크톱)</li>
+            <li>결과 공유 기능</li>
+          </ul>
+        </div>
+
+        <div class="highlight-box green mt-10">
+          <div class="icon">🚀</div>
+          <p><strong>배포 완료!</strong> Vercel CDN으로 전세계 접속 가능</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">7 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 8: 데이터 및 기술 활용 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">07</div>
+      <span class="header-title">데이터 및 기술 활용 (Data & Tech)</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2 mb-16">
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon">📊</div>
+          <div class="section-title-group">
+            <h2>활용 데이터</h2>
+            <p>24개 기관의 신뢰할 수 있는 출처</p>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>분류</th>
+              <th>주요 출처</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>🏛️ 정부·공공 (8)</td>
+              <td>금융감독원, 경찰청, KISA, 방통위 등</td>
+            </tr>
+            <tr>
+              <td>🏦 금융기관 (5)</td>
+              <td>KB금융, 국민은행, 토스, 카카오뱅크</td>
+            </tr>
+            <tr>
+              <td>📱 플랫폼 (8)</td>
+              <td>네이버, 카카오, 당근마켓, 번개장터</td>
+            </tr>
+            <tr>
+              <td>📰 언론 (3)</td>
+              <td>YTN, SBS, 뉴스1</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">
+          * 공개된 사기 패턴 기반 자체 생성, 개인정보 미포함
+        </p>
+      </div>
+
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon" style="background: #DC2626;">⚙️</div>
+          <div class="section-title-group">
+            <h2>기술 스택</h2>
+            <p>최신 기술 기반 서버리스 아키텍처</p>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <td>Frontend</td>
+              <td><span class="badge blue">Next.js 16</span> + TailwindCSS + shadcn/ui</td>
+            </tr>
+            <tr>
+              <td>Backend</td>
+              <td><span class="badge purple">Serverless</span> API Routes</td>
+            </tr>
+            <tr>
+              <td>AI Engine</td>
+              <td><span class="badge green">OpenAI GPT-5.2</span></td>
+            </tr>
+            <tr>
+              <td>Database</td>
+              <td><span class="badge blue">Neon</span> PostgreSQL + Drizzle ORM</td>
+            </tr>
+            <tr>
+              <td>Deploy</td>
+              <td><span class="badge purple">Vercel</span> CDN (글로벌 배포)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-4">
+      <div class="stat-card">
+        <div class="icon red">📝</div>
+        <div class="number">104</div>
+        <div class="label">총 문항 수</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon blue">📂</div>
+        <div class="number">4</div>
+        <div class="label">카테고리</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon purple">⚡</div>
+        <div class="number">32</div>
+        <div class="label">고급 모드</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon green">🏛️</div>
+        <div class="number">24</div>
+        <div class="label">데이터 출처</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">8 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 9: 사용자 시나리오 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">08</div>
+      <span class="header-title">사용자 시나리오 (User Scenario)</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2">
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon">👥</div>
+          <div class="section-title-group">
+            <h2>주요 타겟 사용자</h2>
+            <p>핵심 페르소나 정의</p>
+          </div>
+        </div>
+
+        <div class="card gradient-1 mb-12">
+          <h3><span class="icon-circle blue">🎯</span> MZ세대 (20~40대)</h3>
+          <p>디지털 네이티브지만 피싱·스캠 피해 비율 42%로 높음<br>게이미피케이션에 익숙하고 경쟁 요소에 반응</p>
+        </div>
+
+        <div class="card gradient-2 mb-10">
+          <h3><span class="icon-circle purple">💳</span> 디지털 금융 이용자</h3>
+          <p>스마트폰 뱅킹, 중고거래, SNS 활발 사용<br>다양한 경로로 사기 메시지에 노출</p>
+        </div>
+
+        <div class="highlight-box purple" style="margin-top: 8px;">
+          <div class="icon">📊</div>
+          <p><strong>능동적 학습:</strong> 수동적 학습 대비 기억 정착률 2~3배 향상</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header mb-10">
+          <div class="section-icon" style="background: #059669;">🔄</div>
+          <div class="section-title-group">
+            <h2>사용자 행동 흐름</h2>
+            <p>5단계 학습 여정</p>
+          </div>
+        </div>
+
+        <div class="user-flow">
+          <div class="user-flow-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>서비스 접속 → 온보딩</h4>
+              <p>첫 방문 시 서비스 소개 및 가이드</p>
+            </div>
+          </div>
+          <div class="user-flow-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>카테고리 선택</h4>
+              <p>스미싱 / 중고거래 / 알바 / SNS 중 선택</p>
+            </div>
+          </div>
+          <div class="user-flow-item highlight">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>퀴즈 플레이</h4>
+              <p>"사기" vs "정상" 직접 판별 체험</p>
+            </div>
+          </div>
+          <div class="user-flow-item">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>AI 해설 확인</h4>
+              <p>GPT-5.2가 사기 포인트 친절히 설명</p>
+            </div>
+          </div>
+          <div class="user-flow-item">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4>결과 확인 → 공유</h4>
+              <p>랭킹 등록 및 SNS 공유로 바이럴</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">9 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 10: 기대 효과 및 향후 확장성 -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="header-left">
+      <div class="header-number">09</div>
+      <span class="header-title">기대 효과 및 향후 확장성 (Expected Impact)</span>
+    </div>
+    <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2 mb-14">
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon">📈</div>
+          <div class="section-title-group">
+            <h2>기대 효과</h2>
+            <p>측정 가능한 성과 목표</p>
+          </div>
+        </div>
+
+        <div class="impact-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="impact-card">
+            <div class="number">20+</div>
+            <div class="unit">문항</div>
+            <div class="label">사용자당 평균 학습량</div>
+          </div>
+          <div class="impact-card">
+            <div class="number">50%</div>
+            <div class="unit">감소</div>
+            <div class="label">피해 확률 (추정)</div>
+          </div>
+        </div>
+
+        <div class="card gradient-1 mt-12">
+          <h4>핵심 효과</h4>
+          <ul style="margin: 0;">
+            <li>체험 학습 → 실질적 판별 능력 향상</li>
+            <li>랭킹 경쟁 → 지속적 재방문 유도</li>
+            <li>결과 공유 → 2차 예방 효과 확산</li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header mb-12">
+          <div class="section-icon" style="background: #DC2626;">🚀</div>
+          <div class="section-title-group">
+            <h2>향후 확장성</h2>
+            <p>단계별 로드맵</p>
+          </div>
+        </div>
+
+        <div class="roadmap">
+          <div class="roadmap-item">
+            <div class="roadmap-phase current">
+              <span class="roadmap-badge">단기</span>
+              <h4>콘텐츠 확대</h4>
+              <ul>
+                <li>신규 사기 유형 추가</li>
+                <li>다국어 지원 (영어)</li>
+                <li>시니어 모드</li>
+              </ul>
+            </div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-phase">
+              <span class="roadmap-badge">중기</span>
+              <h4>플랫폼 확장</h4>
+              <ul>
+                <li>모바일 앱 출시</li>
+                <li>기업/기관 교육용</li>
+                <li>학교 교육과정 연계</li>
+              </ul>
+            </div>
+          </div>
+          <div class="roadmap-item">
+            <div class="roadmap-phase">
+              <span class="roadmap-badge gray">장기</span>
+              <h4>생태계 구축</h4>
+              <ul>
+                <li>경찰청/금감원 연계</li>
+                <li>B2B 기업 교육</li>
+                <li>실시간 신고 연동</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box green text-center">
+      <div class="icon">🎯</div>
+      <p style="font-size: 17px;"><strong>궁극적 목표:</strong> 대한민국 피싱·스캠 피해 제로화에 기여</p>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">10 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+<!-- 슬라이드 11: 감사합니다 -->
+<div class="slide final">
+  <div class="slide-content">
+    <div class="final-icon">🔍</div>
+    <h1 class="final-title">탐정 안속아</h1>
+    <p class="final-subtitle">"직접 경험해봐야 안 속는다"</p>
+
+    <div class="final-stats">
+      <div class="final-stat">
+        <div class="number">104</div>
+        <div class="label">실제 사례 문항</div>
+      </div>
+      <div class="final-stat">
+        <div class="number">GPT-5.2</div>
+        <div class="label">AI 개인화 해설</div>
+      </div>
+      <div class="final-stat">
+        <div class="number">24</div>
+        <div class="label">신뢰 데이터 출처</div>
+      </div>
+    </div>
+
+    <div class="qr-box">
+      <div class="qr-code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://scam-prevention-mvp.vercel.app" alt="QR Code">
+      </div>
+      <div class="qr-text">
+        <h4>🚀 지금 바로 체험하기</h4>
+        <p>https://scam-prevention-mvp.vercel.app</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-page">11 / 11</span>
+    <div class="footer-logos">
+      <span style="font-weight: 700; color: #1e40af; font-size: 14px;">DataUniverse</span>
+      <span style="font-weight: 700; color: #00A8E8; font-size: 14px;">DACON</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
