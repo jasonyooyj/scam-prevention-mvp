@@ -50,7 +50,7 @@ ${scamPoints.map((p, i) => `${i + 1}. ${p}`).join('\n')}
         content: prompt,
       },
     ],
-    max_completion_tokens: 500,
+    max_completion_tokens: 1500,
     temperature: 0.7,
   });
 
