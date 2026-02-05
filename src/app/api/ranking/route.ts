@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
         .select({
           id: userScores.id,
           sessionId: userScores.sessionId,
+          nickname: userScores.nickname,
           category: userScores.category,
           score: userScores.score,
           correctCount: userScores.correctCount,
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
         .select({
           id: userScores.id,
           sessionId: userScores.sessionId,
+          nickname: userScores.nickname,
           category: userScores.category,
           score: userScores.score,
           correctCount: userScores.correctCount,

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { sessionId, category, score, correctCount, totalCount } = body;
+    const { sessionId, category, score, correctCount, totalCount, nickname } = body;
 
     // 필수 필드 검증
     if (!sessionId || !category || score === undefined || correctCount === undefined || totalCount === undefined) {
@@ -34,9 +34,19 @@ export async function POST(request: NextRequest) {
 
     const db = getDb();
 
+    // Validate nickname if provided
+    let validatedNickname: string | null = null;
+    if (nickname && typeof nickname === 'string') {
+      const trimmed = nickname.trim();
+      if (trimmed.length >= 2 && trimmed.length <= 20) {
+        validatedNickname = trimmed;
+      }
+    }
+
     // 점수 저장
     const result = await db.insert(userScores).values({
       sessionId,
+      nickname: validatedNickname,
       category,
       score,
       correctCount,

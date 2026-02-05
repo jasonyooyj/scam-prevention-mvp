@@ -29,6 +29,7 @@ const categoryColors: Record<string, string> = {
 interface ScoreEntry {
   id: number;
   sessionId: string;
+  nickname: string | null;
   category: string;
   score: number;
   correctCount: number;
@@ -271,7 +272,7 @@ export default function RankingPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-slate-700 dark:text-slate-300">
-                                익명 유저
+                                {score.nickname || '익명 유저'}
                               </span>
                               {isMe && (
                                 <span className="text-xs bg-primary text-white px-1.5 py-0.5 rounded">

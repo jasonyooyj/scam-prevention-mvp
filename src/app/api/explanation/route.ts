@@ -74,9 +74,26 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Explanation generation error:', error);
+
+    // Determine appropriate Korean error message
+    let errorMessage = 'AI 응답 생성에 실패했습니다. 다시 시도해주세요.';
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      const message = error.message.toLowerCase();
+      if (message.includes('rate limit') || message.includes('429')) {
+        errorMessage = 'AI 서비스가 바쁩니다. 잠시 후 다시 시도해주세요.';
+        statusCode = 429;
+      } else if (message.includes('empty response')) {
+        errorMessage = 'AI 응답이 비어있습니다. 다시 시도해주세요.';
+      } else if (message.includes('timeout')) {
+        errorMessage = '응답 시간이 초과되었습니다. 다시 시도해주세요.';
+      }
+    }
+
     return NextResponse.json(
-      { success: false, error: 'Failed to generate explanation' },
-      { status: 500 }
+      { success: false, error: errorMessage },
+      { status: statusCode }
     );
   }
 }

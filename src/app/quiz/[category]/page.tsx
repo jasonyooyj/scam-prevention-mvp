@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, CheckCircle, XCircle, ArrowRight, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
 import { categoryLabels } from '@/data/quizzes';
+import { useSound, useVibration } from '@/hooks/useSound';
 
 // DB에서 가져오는 퀴즈 타입
 interface QuizFromDB {
@@ -52,6 +53,14 @@ export default function QuizPage({ params }: PageProps) {
   const [aiLoading, setAiLoading] = useState(false);
   const [showAiExplanation, setShowAiExplanation] = useState(false);
 
+  // Animation state
+  const [answerAnimation, setAnswerAnimation] = useState<'correct' | 'incorrect' | null>(null);
+
+  // Sound and haptic hooks
+  const { play: playCorrect } = useSound('/sounds/correct.mp3', { volume: 0.5 });
+  const { play: playIncorrect } = useSound('/sounds/incorrect.mp3', { volume: 0.5 });
+  const { vibrate } = useVibration();
+
   // API에서 퀴즈 가져오기
   useEffect(() => {
     async function fetchQuizzes() {
@@ -94,9 +103,20 @@ export default function QuizPage({ params }: PageProps) {
     setAiExplanation(null);
     setShowAiExplanation(false);
 
-    if (answer === currentQuiz.isScam) {
+    const correct = answer === currentQuiz.isScam;
+    if (correct) {
       setScore((prev) => prev + 1);
+      playCorrect();
+      vibrate(50);
+      setAnswerAnimation('correct');
+    } else {
+      playIncorrect();
+      vibrate([50, 30, 50]); // double vibration for wrong
+      setAnswerAnimation('incorrect');
     }
+
+    // Clear animation after it plays
+    setTimeout(() => setAnswerAnimation(null), 600);
   };
 
   // AI 해설 요청
@@ -283,7 +303,10 @@ export default function QuizPage({ params }: PageProps) {
                 <div
                   role="alert"
                   aria-label={isCorrect ? '정답입니다' : '틀렸습니다'}
-                  className={`flex items-center gap-3 p-4 rounded-lg ${
+                  className={`flex items-center gap-3 p-4 rounded-lg transition-all ${
+                    answerAnimation === 'correct' ? 'animate-correct' :
+                    answerAnimation === 'incorrect' ? 'animate-incorrect' : ''
+                  } ${
                     isCorrect
                       ? 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300'
                       : 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300'

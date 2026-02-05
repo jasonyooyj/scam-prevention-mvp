@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { withRetry } from './retry';
 
 let openaiClient: OpenAI | null = null;
 
@@ -38,23 +39,34 @@ ${scamPoints.map((p, i) => `${i + 1}. ${p}`).join('\n')}
 
 이 메시지가 안전한 이유를 친근하고 이해하기 쉬운 말투로 설명해주세요. 이모지는 사용하지 마세요.`;
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-5.2',
-    messages: [
-      {
-        role: 'system',
-        content: '당신은 피싱/스캠 예방 전문가 "탐정 안속아"입니다. MZ세대에게 친근하게 설명하는 것이 특기입니다.',
-      },
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ],
-    max_completion_tokens: 1500,
-    temperature: 0.7,
+  const result = await withRetry(async () => {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-5.2',
+      messages: [
+        {
+          role: 'system',
+          content: '당신은 피싱/스캠 예방 전문가 "탐정 안속아"입니다. MZ세대에게 친근하게 설명하는 것이 특기입니다.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_completion_tokens: 1500,
+      temperature: 0.7,
+    });
+
+    const content = response.choices[0]?.message?.content;
+
+    // Throw error on empty response to trigger retry
+    if (!content || content.trim() === '') {
+      throw new Error('Empty response from AI');
+    }
+
+    return content;
   });
 
-  return response.choices[0]?.message?.content || '설명을 생성할 수 없습니다.';
+  return result;
 }
 
 export { getOpenAI };

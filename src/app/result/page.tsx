@@ -2,11 +2,14 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Suspense, useState, useEffect, useRef } from 'react';
+import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, Medal, Shield, AlertTriangle, RotateCcw, Grid3X3, Share2, Check, BarChart3 } from 'lucide-react';
 import { getSessionId } from '@/lib/session';
+import NicknameDialog from '@/components/NicknameDialog';
+import Confetti from '@/components/Confetti';
+import { useSound } from '@/hooks/useSound';
 
 // 카테고리 정보
 const categoryNames: Record<string, string> = {
@@ -79,7 +82,12 @@ function getGrade(percentage: number): Grade {
 function ResultContent() {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
-  const scoreSavedRef = useRef(false);
+  const [showNicknameDialog, setShowNicknameDialog] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const dialogShownRef = useRef(false);
+  const nicknameRef = useRef<string | null>(null);
+  const { play: playCelebration } = useSound('/sounds/celebration.mp3', { volume: 0.5 });
 
   // URL 쿼리에서 파라미터 추출
   const score = parseInt(searchParams.get('score') || '0', 10);
@@ -91,53 +99,98 @@ function ResultContent() {
   const GradeIcon = grade.icon;
   const categoryName = categoryNames[category] || category;
 
-  // 점수 저장 (한 번만 실행)
+  // Save score function
+  const saveScore = useCallback(async (nickname: string | null) => {
+    if (scoreSaved) return;
+    setScoreSaved(true);
+
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    try {
+      await fetch('/api/score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          nickname,
+          category,
+          score: percentage,
+          correctCount: score,
+          totalCount: total,
+        }),
+      });
+    } catch (error) {
+      console.error('점수 저장 실패:', error);
+    }
+  }, [category, percentage, score, total, scoreSaved]);
+
+  // Handle nickname submission
+  const handleNicknameSubmit = useCallback((nickname: string | null) => {
+    nicknameRef.current = nickname;
+    setShowNicknameDialog(false);
+    saveScore(nickname);
+  }, [saveScore]);
+
+  // Show nickname dialog and confetti after 1 second
   useEffect(() => {
-    async function saveScore() {
-      if (scoreSavedRef.current) return;
-      scoreSavedRef.current = true;
+    if (dialogShownRef.current) return;
+    dialogShownRef.current = true;
 
-      const sessionId = getSessionId();
-      if (!sessionId) return;
-
-      try {
-        await fetch('/api/score', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sessionId,
-            category,
-            score: percentage,
-            correctCount: score,
-            totalCount: total,
-          }),
-        });
-      } catch (error) {
-        console.error('점수 저장 실패:', error);
-      }
+    // Show confetti for high scores (80%+)
+    if (percentage >= 80) {
+      setShowConfetti(true);
+      playCelebration();
     }
 
-    saveScore();
-  }, [category, percentage, score, total]);
+    const timer = setTimeout(() => {
+      setShowNicknameDialog(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [percentage, playCelebration]);
 
   // 공유하기 기능
   const handleShare = async () => {
-    const shareText = `[탐정 안속아] ${categoryName} 퀴즈 결과\n\n등급: ${grade.title}\n점수: ${score}/${total} (${percentage}%)\n\n나도 사기 탐지 능력 테스트하기!`;
+    const shareUrl = 'https://scam-prevention-mvp.vercel.app';
+    const shareText = `[탐정 안속아] ${categoryName} 퀴즈 결과\n\n등급: ${grade.title}\n점수: ${score}/${total} (${percentage}%)\n\n나도 사기 탐지 능력 테스트하기!\n${shareUrl}`;
 
+    // Try Web Share API first (mobile)
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: '탐정 안속아 - 퀴즈 결과',
+          text: `${grade.title} 등급! ${score}/${total} (${percentage}%) 정답`,
+          url: shareUrl,
+        });
+        return;
+      } catch (err) {
+        // User cancelled or not supported, fall through to clipboard
+        if ((err as Error).name !== 'AbortError') {
+          console.log('Web Share failed, using clipboard');
+        }
+      }
+    }
+
+    // Fallback to clipboard
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      // 클립보드 API 지원 안되는 경우 대체
       console.error('클립보드 복사 실패:', err);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+      <Confetti isActive={showConfetti} duration={4000} />
+      <NicknameDialog
+        isOpen={showNicknameDialog}
+        onSubmit={handleNicknameSubmit}
+      />
       <main className="container mx-auto px-4 py-12 max-w-2xl">
         {/* 헤더 */}
         <header className="text-center mb-8">

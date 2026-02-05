@@ -13,6 +13,7 @@ export const quizzes = pgTable('quizzes', {
 export const userScores = pgTable('user_scores', {
   id: serial('id').primaryKey(),
   sessionId: varchar('session_id', { length: 100 }).notNull(),
+  nickname: varchar('nickname', { length: 20 }), // nullable for anonymous users
   category: varchar('category', { length: 50 }).notNull(),
   score: integer('score').notNull(),
   correctCount: integer('correct_count').notNull(),
