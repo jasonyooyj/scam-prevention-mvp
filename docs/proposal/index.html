@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#F8FAFC">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://api.qrserver.com" crossorigin>
   <title>탐정 안속아 - MVP 제안서</title>
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -41,8 +44,15 @@
       background: #f1f5f9;
       color: var(--text);
       line-height: 1.6;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
       min-height: 100vh;
       padding: 40px 20px;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
     }
 
     .slide {
@@ -61,6 +71,8 @@
       body {
         background: white;
         padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
       .slide {
         margin: 0;
@@ -68,6 +80,17 @@
         border-radius: 0;
         page-break-after: always;
       }
+    }
+
+    h1, h2, h3, .header-title, .cover-title, .final-title {
+      text-wrap: balance;
+    }
+
+    .number,
+    .unit,
+    .header-number,
+    .footer-page {
+      font-variant-numeric: tabular-nums;
     }
 
     @page {
@@ -129,6 +152,351 @@
       bottom: 44px;
       padding: 20px 40px;
       overflow: hidden;
+    }
+
+    /* 공간 밀도 고도화: 요청된 슬라이드만 컴포넌트 리사이즈 */
+    .slide-2 .slide-content,
+    .slide-3 .slide-content,
+    .slide-4 .slide-content,
+    .slide-5 .slide-content,
+    .slide-6 .slide-content,
+    .slide-7 .slide-content,
+    .slide-9 .slide-content,
+    .slide-10 .slide-content {
+      padding: 8px 32px;
+    }
+
+    .slide-2 .summary-table td {
+      padding: 26px 30px;
+      font-size: 19px;
+    }
+
+    .slide-2 .summary-table td:first-child {
+      width: 180px;
+    }
+
+    .slide-2 .qr-box {
+      padding: 24px 24px;
+    }
+
+    .slide-2 .qr-box .qr-code {
+      width: 112px;
+      height: 112px;
+      padding: 8px;
+    }
+
+    .slide-2 .qr-box .qr-text h4 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .slide-2 .qr-box .qr-text p {
+      font-size: 16px;
+    }
+
+    .slide-2 .qr-box .qr-text .url {
+      font-size: 15px;
+    }
+
+    .slide-3 .stat-card {
+      padding: 24px 16px;
+    }
+
+    .slide-3 .stat-card .number {
+      font-size: 44px;
+    }
+
+    .slide-3 .section-title-group h2 {
+      font-size: 24px;
+    }
+
+    .slide-3 .section-title-group p {
+      font-size: 14px;
+    }
+
+    .slide-3 .feature-item {
+      padding: 18px 16px;
+    }
+
+    .slide-3 .feature-item .icon {
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+    }
+
+    .slide-3 .feature-item h4 {
+      font-size: 17px;
+    }
+
+    .slide-3 .feature-item p {
+      font-size: 15px;
+    }
+
+    .slide-3 .highlight-box {
+      padding: 18px 20px;
+    }
+
+    .slide-3 .highlight-box p {
+      font-size: 16px;
+    }
+
+    .slide-3 .feature-list {
+      gap: 10px;
+    }
+
+    .slide-4 .highlight-box {
+      padding: 16px 20px;
+    }
+
+    .slide-4 .highlight-box p {
+      font-size: 17px !important;
+    }
+
+    .slide-4 .flow-diagram {
+      padding: 20px 14px;
+      gap: 8px;
+    }
+
+    .slide-4 .flow-step {
+      min-width: 122px;
+      padding: 14px 8px;
+    }
+
+    .slide-4 .flow-step .icon {
+      width: 52px;
+      height: 52px;
+      font-size: 25px;
+    }
+
+    .slide-4 .flow-step .label {
+      font-size: 13px;
+    }
+
+    .slide-4 .flow-step .sublabel {
+      font-size: 12px;
+    }
+
+    .slide-4 .card {
+      padding: 20px;
+    }
+
+    .slide-4 .card h3 {
+      font-size: 18px;
+    }
+
+    .slide-4 .card ul li {
+      font-size: 15px;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    .slide-5 .screenshot-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 12px !important;
+    }
+
+    .slide-5 .screenshot-item {
+      min-height: 222px;
+      padding: 16px;
+    }
+
+    .slide-5 .screenshot-item .mock-screen {
+      width: 136px;
+      height: 198px;
+    }
+
+    .slide-5 .screenshot-item h4 {
+      font-size: 16px;
+    }
+
+    .slide-5 .screenshot-item p {
+      font-size: 14px;
+    }
+
+    .slide-5 .qr-box {
+      padding: 16px 20px;
+    }
+
+    .slide-5 .qr-box .qr-text h4 {
+      font-size: 18px;
+    }
+
+    .slide-6 .compare-table th,
+    .slide-6 .compare-table td {
+      padding: 17px 16px;
+      font-size: 15px;
+    }
+
+    .slide-6 .example-box {
+      min-height: 208px;
+      padding: 20px 18px;
+    }
+
+    .slide-6 .example-content {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .slide-6 .scam-point {
+      font-size: 13px;
+      padding: 5px 11px;
+    }
+
+    .slide-6 .grid-2 {
+      align-items: stretch;
+    }
+
+    .slide-7 .data-table th,
+    .slide-7 .data-table td {
+      padding: 14px 14px;
+      font-size: 15px;
+    }
+
+    .slide-7 .slide-content > .grid-2 {
+      height: 100%;
+      align-items: stretch;
+    }
+
+    .slide-7 .slide-content > .grid-2 > div {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .slide-7 .data-table {
+      flex: 1;
+    }
+
+    .slide-7 .card.gradient-3 {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .slide-7 .card.gradient-3 ul li {
+      font-size: 15px;
+      padding: 8px 0 8px 20px;
+    }
+
+    .slide-7 .highlight-box {
+      padding: 16px 18px;
+      margin-top: 12px;
+    }
+
+    .slide-9 .card {
+      padding: 20px;
+    }
+
+    .slide-9 .slide-content > .grid-2 {
+      height: 100%;
+      align-items: stretch;
+    }
+
+    .slide-9 .slide-content > .grid-2 > div {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .slide-9 .card p {
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .slide-9 .user-flow {
+      gap: 10px;
+      flex: 1;
+    }
+
+    .slide-9 .user-flow-item {
+      min-height: 0;
+      flex: 1;
+      padding: 13px 16px;
+    }
+
+    .slide-9 .user-flow-item h4 {
+      font-size: 16px;
+    }
+
+    .slide-9 .user-flow-item p {
+      font-size: 14px;
+    }
+
+    .slide-10 .impact-card {
+      min-height: 220px;
+      padding: 28px 18px;
+    }
+
+    .slide-10 .impact-card .number {
+      font-size: 52px;
+    }
+
+    .slide-10 .impact-card .label {
+      font-size: 15px;
+    }
+
+    .slide-10 .card.gradient-1 {
+      padding: 20px;
+      flex: 1;
+    }
+
+    .slide-10 .card.gradient-1 ul li {
+      font-size: 15px;
+      padding: 6px 0 6px 20px;
+    }
+
+    .slide-10 .roadmap-phase {
+      min-height: 228px;
+      padding: 14px;
+    }
+
+    .slide-10 .roadmap-phase h4 {
+      font-size: 15px;
+    }
+
+    .slide-10 .roadmap-phase ul li {
+      font-size: 14px;
+      padding: 6px 0 6px 16px;
+    }
+
+    .slide-10 .highlight-box {
+      padding: 16px 20px;
+    }
+
+    .slide-10 .slide-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide-10 .slide-content > .grid-2 {
+      margin-bottom: 10px !important;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .slide-10 .slide-content > .grid-2 > div {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .slide-10 .impact-grid {
+      margin-bottom: 14px;
+    }
+
+    .slide-10 .roadmap {
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .slide-10 .roadmap-item {
+      display: flex;
+    }
+
+    .slide-10 .roadmap-phase {
+      width: 100%;
     }
 
     /* 푸터 */
@@ -311,7 +679,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
-      transition: all 0.2s;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
 
     .card.gradient-1 {
@@ -612,7 +980,7 @@
     }
 
     .flow-step .sublabel {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
     }
@@ -1085,6 +1453,12 @@
     .badge.red { background: #FEE2E2; color: #991B1B; }
     .badge.purple { background: #EDE9FE; color: #5B21B6; }
 
+    .source-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
     .icon-circle {
       width: 26px;
       height: 26px;
@@ -1233,11 +1607,11 @@
 </div>
 
 <!-- 슬라이드 2: Summary -->
-<div class="slide">
+<div class="slide slide-2">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">01</div>
-      <span class="header-title">Summary</span>
+      <span class="header-title">요약 (Summary)</span>
     </div>
     <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
   </div>
@@ -1254,7 +1628,7 @@
       </tr>
       <tr>
         <td>프로젝트명</td>
-        <td><strong style="font-size: 20px; color: #1e3a8a;">탐정 안속아</strong> <span class="badge blue">MVP 완성</span></td>
+        <td><strong style="font-size: 20px; color: #1e3a8a;">탐정 안속아</strong> <span class="badge blue">MVP 배포 완료</span></td>
       </tr>
       <tr>
         <td>세부 주제</td>
@@ -1262,13 +1636,13 @@
       </tr>
       <tr>
         <td>한줄소개</td>
-        <td>실제 사기 사례 기반 <strong>104개 퀴즈</strong>로 판별 능력을 키우고, <strong>GPT-5.2</strong>가 친근하게 해설해주는 게이미피케이션 예방 교육 플랫폼</td>
+        <td>실제 사기 사례 기반 <strong>112개 퀴즈 (일반 70 + 고급 42)</strong>로 판별 능력을 높이고, <strong>GPT-5.2</strong>가 근거 중심으로 해설해주는 <strong>설치 없는 모바일 웹</strong> 예방 교육 플랫폼</td>
       </tr>
     </table>
 
     <div class="qr-box mt-16">
       <div class="qr-code">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://scam-prevention-mvp.vercel.app" alt="QR Code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&amp;data=https://scam-prevention-mvp.vercel.app" alt="서비스 체험 QR 코드" width="80" height="80" loading="lazy">
       </div>
       <div class="qr-text">
         <h4>🚀 지금 바로 체험해보세요!</h4>
@@ -1288,7 +1662,7 @@
 </div>
 
 <!-- 슬라이드 3: 문제 정의 -->
-<div class="slide">
+<div class="slide slide-3">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">02</div>
@@ -1327,7 +1701,7 @@
           <div class="label">연간 스미싱 피해 건수</div>
         </div>
 
-        <p style="font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center;">
+        <p class="source-note" style="text-align: center; margin-top: 8px;">
           출처: 금융감독원, 경찰청, KISA (2024)
         </p>
       </div>
@@ -1383,7 +1757,7 @@
 </div>
 
 <!-- 슬라이드 4: 제안 솔루션 개요 -->
-<div class="slide">
+<div class="slide slide-4">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">03</div>
@@ -1425,7 +1799,7 @@
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="icon">🏆</div>
-        <div class="label">점수 & 랭킹</div>
+        <div class="label">점수 &amp; 랭킹</div>
         <div class="sublabel">경쟁 유도</div>
       </div>
     </div>
@@ -1434,9 +1808,9 @@
       <div class="card gradient-1">
         <h3><span class="icon-circle red">📝</span> 퀴즈 기반 체험 학습</h3>
         <ul>
-          <li>104개 실제 사례 기반 문제</li>
+          <li>112개 실제 사례 기반 문제</li>
           <li>4개 카테고리 분류</li>
-          <li>난이도별 문제 구성</li>
+          <li>일반 70 + 고급 42 구성</li>
           <li>직접 판별 → 기억 정착률 ↑</li>
         </ul>
       </div>
@@ -1455,7 +1829,7 @@
           <li>전체/카테고리별 랭킹</li>
           <li>점수 및 등급 시스템</li>
           <li>결과 공유 기능</li>
-          <li>재방문 및 학습 동기 ↑</li>
+          <li>모바일 즉시 재도전으로 학습 루프 강화</li>
         </ul>
       </div>
     </div>
@@ -1471,7 +1845,7 @@
 </div>
 
 <!-- 슬라이드 5: MVP 데모 스크린샷 -->
-<div class="slide">
+<div class="slide slide-5">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">04</div>
@@ -1519,18 +1893,18 @@
             <div style="font-size: 11px; color: var(--text-secondary);">순위 확인</div>
           </div>
         </div>
-        <h4>랭킹 & 결과</h4>
+        <h4>랭킹 &amp; 결과</h4>
         <p>점수 및 순위 공유</p>
       </div>
     </div>
 
     <div class="qr-box">
       <div class="qr-code">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://scam-prevention-mvp.vercel.app" alt="QR Code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&amp;data=https://scam-prevention-mvp.vercel.app" alt="서비스 체험 QR 코드" width="100" height="100" loading="lazy">
       </div>
       <div class="qr-text">
         <h4>🔗 실제 동작하는 MVP를 직접 체험해보세요!</h4>
-        <p>모바일/데스크톱 모두 지원 · 회원가입 없이 바로 시작</p>
+        <p>설치 없이 모바일 웹 즉시 시작 · 데스크톱 연속 학습 지원</p>
         <span class="url">https://scam-prevention-mvp.vercel.app</span>
       </div>
     </div>
@@ -1546,7 +1920,7 @@
 </div>
 
 <!-- 슬라이드 6: 비교표 -->
-<div class="slide">
+<div class="slide slide-6">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">05</div>
@@ -1573,7 +1947,7 @@
         <tr>
           <td>📝 콘텐츠 양</td>
           <td class="old-cell">5~10개 단순 예시</td>
-          <td class="new-cell">104개 실제 사례 + 고급 모드 32문항</td>
+          <td class="new-cell">112개 실제 사례 + 고급 모드 42문항</td>
         </tr>
         <tr>
           <td>💬 피드백</td>
@@ -1583,7 +1957,7 @@
         <tr>
           <td>🎮 동기부여</td>
           <td class="old-cell">없음 (지루함)</td>
-          <td class="new-cell">랭킹 / 점수 / 등급 / 공유</td>
+          <td class="new-cell">랭킹 / 점수 / 공유 + 모바일 즉시 재도전</td>
         </tr>
       </tbody>
     </table>
@@ -1619,7 +1993,7 @@
 </div>
 
 <!-- 슬라이드 7: 주요 기능 정의 -->
-<div class="slide">
+<div class="slide slide-7">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">06</div>
@@ -1649,7 +2023,7 @@
           <tbody>
             <tr>
               <td>🎮 퀴즈 플레이</td>
-              <td>실제 사기 vs 정상 메시지 판별<br>4개 카테고리, 총 104문항</td>
+              <td>실제 사기 vs 정상 메시지 판별<br>4개 카테고리, 총 112문항</td>
             </tr>
             <tr>
               <td>🤖 AI 해설</td>
@@ -1661,7 +2035,7 @@
             </tr>
             <tr>
               <td>⚡ 고급 모드</td>
-              <td>정교하게 위장된 32문항<br>실제 피해자도 속은 수법</td>
+              <td>정교하게 위장된 42문항<br>실제 피해자도 속은 수법 반영</td>
             </tr>
           </tbody>
         </table>
@@ -1684,14 +2058,14 @@
             <li>온보딩 플로우 (첫 방문 가이드)</li>
             <li>진행 상황 자동 저장 및 복원</li>
             <li>접근성 지원 (ARIA, 키보드 내비게이션)</li>
-            <li>반응형 디자인 (모바일/데스크톱)</li>
+            <li>모바일 퍼스트 UX (한 손 조작 · 큰 터치 영역)</li>
             <li>결과 공유 기능</li>
           </ul>
         </div>
 
         <div class="highlight-box green mt-10">
           <div class="icon">🚀</div>
-          <p><strong>배포 완료!</strong> Vercel CDN으로 전세계 접속 가능</p>
+          <p><strong>배포 완료!</strong> QR/링크로 모바일에서 즉시 접속 가능</p>
         </div>
       </div>
     </div>
@@ -1711,7 +2085,7 @@
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">07</div>
-      <span class="header-title">데이터 및 기술 활용 (Data & Tech)</span>
+      <span class="header-title">데이터 및 기술 활용 (Data &amp; Tech)</span>
     </div>
     <div class="header-right">피싱·스캠 예방을 위한 서비스 개발 경진대회</div>
   </div>
@@ -1723,7 +2097,7 @@
           <div class="section-icon">📊</div>
           <div class="section-title-group">
             <h2>활용 데이터</h2>
-            <p>24개 기관의 신뢰할 수 있는 출처</p>
+            <p>문서화된 공개 출처 32개 기반 시나리오</p>
           </div>
         </div>
 
@@ -1748,13 +2122,21 @@
               <td>네이버, 카카오, 당근마켓, 번개장터</td>
             </tr>
             <tr>
-              <td>📰 언론 (3)</td>
-              <td>YTN, SBS, 뉴스1</td>
+              <td>₿ 가상자산 (2)</td>
+              <td>업비트, 빗썸</td>
+            </tr>
+            <tr>
+              <td>🧩 소비자·취업 (5)</td>
+              <td>한국소비자원, 더치트, 알바몬 등</td>
+            </tr>
+            <tr>
+              <td>📰 언론·해외 (4)</td>
+              <td>YTN, SBS, 뉴스1, FBI IC3</td>
             </tr>
           </tbody>
         </table>
-        <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">
-          * 공개된 사기 패턴 기반 자체 생성, 개인정보 미포함
+        <p class="source-note">
+          * 공개된 사기 패턴 기반 자체 생성 · 개인정보 미포함 · DATA_SOURCES.md(2026-02-05) 기준
         </p>
       </div>
 
@@ -1797,7 +2179,7 @@
     <div class="grid-4">
       <div class="stat-card">
         <div class="icon red">📝</div>
-        <div class="number">104</div>
+        <div class="number">112</div>
         <div class="label">총 문항 수</div>
       </div>
       <div class="stat-card">
@@ -1807,12 +2189,12 @@
       </div>
       <div class="stat-card">
         <div class="icon purple">⚡</div>
-        <div class="number">32</div>
+        <div class="number">42</div>
         <div class="label">고급 모드</div>
       </div>
       <div class="stat-card">
         <div class="icon green">🏛️</div>
-        <div class="number">24</div>
+        <div class="number">32</div>
         <div class="label">데이터 출처</div>
       </div>
     </div>
@@ -1828,7 +2210,7 @@
 </div>
 
 <!-- 슬라이드 9: 사용자 시나리오 -->
-<div class="slide">
+<div class="slide slide-9">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">08</div>
@@ -1850,7 +2232,7 @@
 
         <div class="card gradient-1 mb-12">
           <h3><span class="icon-circle blue">🎯</span> MZ세대 (20~40대)</h3>
-          <p>디지털 네이티브지만 피싱·스캠 피해 비율 42%로 높음<br>게이미피케이션에 익숙하고 경쟁 요소에 반응</p>
+          <p>디지털 네이티브지만 피싱·스캠 피해 비율 42%로 높음<br>짧은 빈 시간 모바일 학습에 익숙하고 경쟁 요소에 반응</p>
         </div>
 
         <div class="card gradient-2 mb-10">
@@ -1860,7 +2242,7 @@
 
         <div class="highlight-box purple" style="margin-top: 8px;">
           <div class="icon">📊</div>
-          <p><strong>능동적 학습:</strong> 수동적 학습 대비 기억 정착률 2~3배 향상</p>
+          <p><strong>능동적 학습:</strong> 수동형 전달보다 판별 근거를 더 오래 기억하도록 설계</p>
         </div>
       </div>
 
@@ -1877,8 +2259,8 @@
           <div class="user-flow-item">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h4>서비스 접속 → 온보딩</h4>
-              <p>첫 방문 시 서비스 소개 및 가이드</p>
+              <h4>모바일 링크 접속 → 온보딩</h4>
+              <p>설치 없이 즉시 진입, 첫 방문 가이드 제공</p>
             </div>
           </div>
           <div class="user-flow-item">
@@ -1924,7 +2306,7 @@
 </div>
 
 <!-- 슬라이드 10: 기대 효과 및 향후 확장성 -->
-<div class="slide">
+<div class="slide slide-10">
   <div class="slide-header">
     <div class="header-left">
       <div class="header-number">09</div>
@@ -1948,21 +2330,23 @@
           <div class="impact-card">
             <div class="number">20+</div>
             <div class="unit">문항</div>
-            <div class="label">사용자당 평균 학습량</div>
+            <div class="label">모바일 세션 기준 사용자당 평균 학습량</div>
           </div>
           <div class="impact-card">
-            <div class="number">50%</div>
-            <div class="unit">감소</div>
-            <div class="label">피해 확률 (추정)</div>
+            <div class="number">+15%p</div>
+            <div class="unit">향상 목표</div>
+            <div class="label">사전/사후 정답률 (파일럿)</div>
           </div>
         </div>
 
         <div class="card gradient-1 mt-12">
-          <h4>핵심 효과</h4>
+          <h4>핵심 효과 &amp; 검증 계획</h4>
           <ul style="margin: 0;">
             <li>체험 학습 → 실질적 판별 능력 향상</li>
             <li>랭킹 경쟁 → 지속적 재방문 유도</li>
             <li>결과 공유 → 2차 예방 효과 확산</li>
+            <li>QR 진입→첫 문제 시작 전환율로 모바일 확산성 측정</li>
+            <li>동일 사용자 2주 추적으로 학습 유지율 측정</li>
           </ul>
         </div>
       </div>
@@ -2016,7 +2400,7 @@
 
     <div class="highlight-box green text-center">
       <div class="icon">🎯</div>
-      <p style="font-size: 17px;"><strong>궁극적 목표:</strong> 대한민국 피싱·스캠 피해 제로화에 기여</p>
+      <p style="font-size: 17px;"><strong>궁극적 목표:</strong> 일상에서 반복 가능한 피싱·스캠 예방 훈련 인프라 구축</p>
     </div>
   </div>
 
@@ -2038,7 +2422,7 @@
 
     <div class="final-stats">
       <div class="final-stat">
-        <div class="number">104</div>
+        <div class="number">112</div>
         <div class="label">실제 사례 문항</div>
       </div>
       <div class="final-stat">
@@ -2046,14 +2430,14 @@
         <div class="label">AI 개인화 해설</div>
       </div>
       <div class="final-stat">
-        <div class="number">24</div>
+        <div class="number">32</div>
         <div class="label">신뢰 데이터 출처</div>
       </div>
     </div>
 
     <div class="qr-box">
       <div class="qr-code">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://scam-prevention-mvp.vercel.app" alt="QR Code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&amp;data=https://scam-prevention-mvp.vercel.app" alt="서비스 체험 QR 코드" width="80" height="80" loading="lazy">
       </div>
       <div class="qr-text">
         <h4>🚀 지금 바로 체험하기</h4>
